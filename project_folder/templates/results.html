@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card result-screen" style="text-align: center; padding: 50px; background-color: #f0fff4; border-radius: 15px; box-shadow: 0 8px 16px rgba(40, 167, 69, 0.3);">
+    <h2 style="color: #28a745;">Screen Complete! 🎉</h2>
+    
+    <p class="score-summary" style="font-size: 1.5em; margin: 20px 0;">
+        You answered <strong style="color: #007bff;">{{ score }} out of {{ total }}</strong> questions correctly.
+    </p>
+    <p class="percentage" style="font-size: 2em; font-weight: bold; color: #28a745;">
+        Score: {{ percentage }}%
+    </p>
+
+    {% if reward %}
+        <div class="reward-box" style="margin-top: 30px; padding: 20px; background-color: #fff3cd; border: 2px dashed #ffc107; border-radius: 10px;">
+            <h3 style="color: #dc3545;">REWARD EARNED! 🌟</h3>
+            <p style="font-size: 1.3em;">You won: <strong>{{ reward }}</strong>!</p>
+        </div>
+    {% else %}
+        <p style="color: #6c757d; margin-top: 20px;">You'll need a bit more practice for a badge on this screen, but your total score is still growing!</p>
+    {% endif %}
+
+    <a href="{{ url_for('quiz_screen', category=next_route) if next_route != 'final_score' else url_for('final_score') }}" 
+       class="button next-screen-button" 
+       style="display: inline-block; margin-top: 30px; padding: 15px 35px; background-color: #007bff; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1em;">
+        Continue to Next Screen ({{ QUIZ_DATA[next_route].title.split(':')[0] if next_route != 'final_score' else 'Finish' }})
+    </a>
+</div>
+{% endblock %}
