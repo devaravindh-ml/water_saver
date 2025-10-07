@@ -1,179 +1,190 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Water Saver Home - Mission Start</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 
-{% block content %}
+    <style>
+    /* Background & Font Base */
+    body {
+        background: linear-gradient(135deg, #e0f7fa, #f1f5f9);
+        font-family: 'Poppins', sans-serif;
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+    }
 
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    /* Typography Enhancements */
+    h1, h2, h3, h4 {
+        font-family: 'Luckiest+Guy', cursive;
+        letter-spacing: 1px;
+    }
 
-<style>
-/* Background & Font Base */
-body {
-  background: linear-gradient(135deg, #e0f7fa, #f1f5f9);
-  font-family: 'Poppins', sans-serif;
-  overflow-x: hidden;
-  margin: 0;
-  padding: 0;
-}
+    p, li, a, span {
+        font-family: 'Poppins', sans-serif;
+        letter-spacing: 0.5px;
+    }
 
-/* Typography Enhancements */
-h1, h2, h3, h4 {
-  font-family: 'Luckiest Guy', cursive;
-  letter-spacing: 1px;
-}
+    /* Animations */
+    @keyframes rainbow-border {
+        0% { border-color: #ef4444; }
+        25% { border-color: #f59e0b; }
+        50% { border-color: #10b981; }
+        75% { border-color: #3b82f6; }
+        100% { border-color: #8b5cf6; }
+    }
 
-p, li, a, span {
-  font-family: 'Poppins', sans-serif;
-  letter-spacing: 0.5px;
-}
+    @keyframes intense-pulse {
+        0%, 100% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
+        50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.7); }
+    }
 
-/* Animations */
-@keyframes rainbow-border {
-  0% { border-color: #ef4444; }
-  25% { border-color: #f59e0b; }
-  50% { border-color: #10b981; }
-  75% { border-color: #3b82f6; }
-  100% { border-color: #8b5cf6; }
-}
+    @keyframes bounce-in {
+        0% { transform: scale(0.8); opacity: 0; }
+        50% { transform: scale(1.05); opacity: 1; }
+        100% { transform: scale(1); }
+    }
 
-@keyframes intense-pulse {
-  0%, 100% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.4); }
-  50% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.7); }
-}
+    /* Decorative Classes */
+    .shimmer-border {
+        animation: rainbow-border 5s infinite alternate;
+        border-width: 6px;
+    }
 
-@keyframes bounce-in {
-  0% { transform: scale(0.8); opacity: 0; }
-  50% { transform: scale(1.05); opacity: 1; }
-  100% { transform: scale(1); }
-}
+    .big-card-glow {
+        animation: intense-pulse 4s infinite;
+    }
 
-/* Decorative Classes */
-.shimmer-border {
-  animation: rainbow-border 5s infinite alternate;
-  border-width: 6px;
-}
+    .header-glow {
+        text-shadow: 2px 2px 0 #fde047, 4px 4px 10px #facc15;
+        transition: all 0.3s ease;
+    }
 
-.big-card-glow {
-  animation: intense-pulse 4s infinite;
-}
+    .header-glow:hover {
+        transform: scale(1.04);
+        color: #fef08a;
+    }
 
-.header-glow {
-  text-shadow: 2px 2px 0 #fde047, 4px 4px 10px #facc15;
-  transition: all 0.3s ease;
-}
+    .list-item-hover:hover {
+        background-color: #bbf7d0;
+        transform: translateX(8px) scale(1.02);
+        box-shadow: 4px 4px 10px rgba(16, 185, 129, 0.5);
+    }
 
-.header-glow:hover {
-  transform: scale(1.04);
-  color: #fef08a;
-}
+    .animate-entrance {
+        animation: bounce-in 1s ease;
+    }
 
-.list-item-hover:hover {
-  background-color: #bbf7d0;
-  transform: translateX(8px) scale(1.02);
-  box-shadow: 4px 4px 10px rgba(16, 185, 129, 0.5);
-}
-
-.animate-entrance {
-  animation: bounce-in 1s ease;
-}
-
-/* Responsive Text Sizes */
-@media (max-width: 768px) {
-  .text-6xl { font-size: 2.5rem; }
-  .text-4xl { font-size: 1.75rem; }
-  .text-3xl { font-size: 1.5rem; }
-}
-</style>
-
+    /* Responsive Text Sizes */
+    @media (max-width: 768px) {
+        .text-6xl { font-size: 2.5rem; }
+        .text-4xl { font-size: 1.75rem; }
+        .text-3xl { font-size: 1.5rem; }
+    }
+    </style>
+</head>
+<body class="p-6">
 <!-- Main Container -->
 <div class="card splash-screen shimmer-border big-card-glow mx-auto max-w-5xl min-h-[80vh] flex flex-col justify-center p-10 md:p-14 bg-white/80 rounded-3xl shadow-2xl mt-6 mb-10 animate-entrance">
 
-  <!-- Banner -->
-  <div class="mb-10">
-    <img
-      src="https://placehold.co/600x200/00bcd4/ffffff?text=+Water+Mission+Start!"
-      alt="Water Mission Banner"
-      class="mx-auto rounded-2xl shadow-xl border-4 border-white transform hover:rotate-2 transition duration-500"
-    />
-  </div>
+    <!-- Banner -->
+    <div class="mb-10">
+        <img
+            src="https://placehold.co/600x200/00bcd4/ffffff?text=+Water+Mission+Start!"
+            alt="Water Mission Banner"
+            class="mx-auto rounded-2xl shadow-xl border-4 border-white transform hover:rotate-2 transition duration-500"
+        />
+    </div>
 
-  <!-- Welcome Header -->
-  <h2 class="text-6xl font-extrabold text-blue-800 mb-6 header-glow text-center">
-    🌊 Welcome, <span style="color:#10b981;">Future</span> Water <span style="color:#ef4444;">Guardian!</span> 💧
-  </h2>
+    <!-- Welcome Header: Modified to display the username -->
+    <h2 class="text-6xl font-extrabold text-blue-800 mb-6 header-glow text-center">
+        🌊 Welcome, <span style="color:#10b981;">{{ username or 'Future' }}</span> Water <span style="color:#ef4444;">Guardian!</span> 💧
+    </h2>
 
-  <!-- Mission Line -->
-  <p class="text-3xl text-pink-600 mb-10 font-black text-center animate-pulse" style="text-shadow: 1px 1px #f9a8d4;">
-    Your mission to save the planet starts now!
-  </p>
+    <!-- Mission Line -->
+    <p class="text-3xl text-pink-600 mb-10 font-black text-center animate-pulse" style="text-shadow: 1px 1px #f9a8d4;">
+        Your mission to save the planet starts now!
+    </p>
 
-  <!-- Mission Briefing Box -->
-  <div class="p-8 rounded-3xl bg-yellow-100 shadow-2xl border-4 shimmer-border mb-10">
-    <h3 class="text-4xl font-black text-red-600 mb-5 border-b-4 border-red-400 pb-3 text-center">
-      🚀 Mission Briefing: How to Play!
-    </h3>
-    <ul class="space-y-4 max-w-xl mx-auto">
-      <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
-        <span class="mr-3 text-3xl">💡</span>
-        <span class="font-semibold text-lg">Answer the questions across <strong>3 awesome screens!</strong></span>
-      </li>
-      <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
-        <span class="mr-3 text-3xl text-green-600">✅</span>
-        <span class="font-semibold text-lg">Get at least <strong>2 out of 3</strong> right to earn a cool Badge!</span>
-      </li>
-      <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
-        <span class="mr-3 text-3xl text-purple-700">🏆</span>
-        <span class="font-semibold text-lg">Collect all the badges to become a <strong>Green Guru!</strong></span>
-      </li>
-    </ul>
-  </div>
+    <!-- Mission Briefing Box -->
+    <div class="p-8 rounded-3xl bg-yellow-100 shadow-2xl border-4 shimmer-border mb-10">
+        <h3 class="text-4xl font-black text-red-600 mb-5 border-b-4 border-red-400 pb-3 text-center">
+            🚀 Mission Briefing: How to Play!
+        </h3>
+        <ul class="space-y-4 max-w-xl mx-auto">
+            <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
+                <span class="mr-3 text-3xl">💡</span>
+                <span class="font-semibold text-lg">Answer the questions across <strong>3 awesome screens!</strong></span>
+            </li>
+            <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
+                <span class="mr-3 text-3xl text-green-600">✅</span>
+                <span class="font-semibold text-lg">Get at least <strong>2 out of 3</strong> right to earn a cool Badge!</span>
+            </li>
+            <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
+                <span class="mr-3 text-3xl text-purple-700">🏆</span>
+                <span class="font-semibold text-lg">Collect all the badges to become a <strong>Green Guru!</strong></span>
+            </li>
+        </ul>
+    </div>
 
-  <!-- Quiz Summary -->
-  <p class="text-3xl font-extrabold text-purple-700 text-center mb-12" style="text-shadow: 1px 1px #ddd;">
-    You'll test your knowledge on: 
-    <span class="text-blue-600 font-bold">The Daily Drip</span>, 
-    <span class="text-green-600 font-bold">Virtual Water Voyage</span>, and 
-    <span class="text-orange-600 font-bold">Eco-Action Challenge</span>.
-  </p>
+    <!-- Quiz Summary -->
+    <p class="text-3xl font-extrabold text-purple-700 text-center mb-12" style="text-shadow: 1px 1px #ddd;">
+        You'll test your knowledge on: 
+        <span class="text-blue-600 font-bold">The Daily Drip</span>, 
+        <span class="text-green-600 font-bold">Virtual Water Voyage</span>, and 
+        <span class="text-orange-600 font-bold">Eco-Action Challenge</span>.
+    </p>
 
-  <!-- Start Button (inline styles) -->
-  <div class="text-center">
-    <a href="{{ url_for('quiz_screen', category='daily_drip') }}"
-       style="
-         display: inline-block;
-         background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-         color: white;
-         font-size: 1.75rem;
-         font-weight: 800;
-         padding: 1rem 2.5rem;
-         border-radius: 1rem;
-         box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
-         transition: all 0.3s ease;
-         text-decoration: none;
-         letter-spacing: 1px;
-         text-transform: uppercase;
-       "
-       onmouseover="this.style.transform='scale(1.06)'; this.style.boxShadow='0 0 25px rgba(139, 92, 246, 0.8)';"
-       onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px rgba(139, 92, 246, 0.6)';"
-       onmousedown="this.style.transform='scale(0.98)';"
-       onmouseup="this.style.transform='scale(1)';"
-    >
-      Start Your Water Mission! 🚀
-    </a>
-  </div>
+    <!-- Start Button (inline styles) -->
+    <div class="text-center">
+        <a href="{{ url_for('quiz_screen', category='daily_drip') }}"
+            style="
+                display: inline-block;
+                background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+                color: white;
+                font-size: 1.75rem;
+                font-weight: 800;
+                padding: 1rem 2.5rem;
+                border-radius: 1rem;
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+                transition: all 0.3s ease;
+                text-decoration: none;
+                letter-spacing: 1px;
+                text-transform: uppercase;
+            "
+            onmouseover="this.style.transform='scale(1.06)'; this.style.boxShadow='0 0 25px rgba(139, 92, 246, 0.8)';"
+            onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px rgba(139, 92, 246, 0.6)';"
+            onmousedown="this.style.transform='scale(0.98)';"
+            onmouseup="this.style.transform='scale(1)';"
+        >
+            Start Your Water Mission! 🚀
+        </a>
+    </div>
+    
+    <!-- Logout Link -->
+    <div class="text-center mt-8">
+        <a href="{{ url_for('logout') }}" class="text-red-500 font-bold hover:text-red-700 text-lg">
+            Logout
+        </a>
+    </div>
 
 </div>
 
 <!-- JS -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("Water Saver Quiz: Welcome screen loaded successfully!");
-  const button = document.querySelector('a[href*="daily_drip"]');
-  if (button) {
-    button.addEventListener('click', () => {
-      console.log("Starting the quiz: daily_drip");
-    });
-  }
+    console.log("Water Saver Quiz: Welcome screen loaded successfully!");
+    const button = document.querySelector('a[href*="daily_drip"]');
+    if (button) {
+        button.addEventListener('click', () => {
+            console.log("Starting the quiz: daily_drip");
+        });
+    }
 });
 </script>
-
-{% endblock %}
+</body>
+</html>

@@ -6,7 +6,7 @@ app.secret_key = 'your_super_secret_key'  # Needed for session management
 # --- Make 'enumerate' available in Jinja templates ---
 app.jinja_env.globals.update(enumerate=enumerate)
 
-# --- Quiz Data Structure ---
+# --- Quiz Data Structure (Unchanged) ---
 QUIZ_DATA = {
     "daily_drip": {
         "title": "Screen 1: The Daily Drip 💧",
@@ -87,7 +87,7 @@ QUIZ_DATA = {
     }
 }
 
-# --- Utility Functions ---
+# --- Utility Functions (Unchanged) ---
 
 def get_total_questions(category):
     return len(QUIZ_DATA[category]["questions"])
@@ -95,41 +95,85 @@ def get_total_questions(category):
 # --- Flask Routes ---
 
 @app.route('/')
-def index():
+def login_page():
+    """Renders the login page. If scores are initialized, redirects to the start page."""
+    if session.get('score') is not None:
+        return redirect(url_for('index_start'))
+    return render_template('login.html')
+
+@app.route('/mock_login', methods=['POST'])
+def mock_login():
+    """Handles the login form submission and redirects to the index."""
+    user_name = request.form.get('user_name')
+    if user_name and user_name.strip():
+        # Store the user's name in the session
+        session['username'] = user_name.strip()
+    
+    # Redirect to the main application index (which resets the quiz state)
+    return redirect(url_for('index_start'))
+
+# This is the main starting point after (mock) login/start.
+@app.route('/index', endpoint='index_start')
+def index_start():
+    """
+    Initializes/resets the session and renders the main index page.
+    Passes the username from the session to the template.
+    """
+    # Initialize/reset session variables
     session['score'] = 0
     session['completed_quizzes'] = []
     session['rewards'] = []
-    return render_template('index.html')
+    
+    # Pass the username to the template
+    # Use .get() to safely handle cases where 'username' might not be set (though it should be after mock_login)
+    username = session.get('username', 'Guest')
+    
+    return render_template('index.html', username=username)
+
+@app.route('/logout')
+def logout():
+    """Clears the session and redirects to the login page."""
+    session.clear() 
+    return redirect(url_for('login_page'))
+
 
 @app.route('/quiz/<category>', methods=['GET', 'POST'])
 def quiz_screen(category):
     if category not in QUIZ_DATA:
-        return redirect(url_for('index'))
+        return redirect(url_for('index_start'))
 
     quiz = QUIZ_DATA[category]
     num_questions = get_total_questions(category)
 
     if request.method == 'POST':
         user_score = 0
+        total_incorrect = 0
         submitted_answers = {}
         for i, q_data in enumerate(quiz["questions"]):
             user_answer = request.form.get(f'q{i}')
             submitted_answers[f'q{i}'] = user_answer
             if user_answer == q_data["answer"]:
                 user_score += 1
+            else:
+                total_incorrect += 1
 
         # Update global score and completed quizzes list
-        session['score'] += user_score
-        if category not in session.get('completed_quizzes', []):
-            session['completed_quizzes'].append(category)
+        session['score'] = session.get('score', 0) + user_score
+        
+        completed = session.get('completed_quizzes', [])
+        if category not in completed:
+            completed.append(category)
+            session['completed_quizzes'] = completed
 
         percentage = int((user_score / num_questions) * 100)
 
         reward_earned = None
+        rewards_list = session.get('rewards', [])
         if percentage >= 66:
             reward_earned = quiz["reward"]
-            if reward_earned not in session.get('rewards', []):
-                session['rewards'].append(reward_earned)
+            if reward_earned not in rewards_list:
+                rewards_list.append(reward_earned)
+                session['rewards'] = rewards_list
 
         # Pass submitted answers and correct answers to the template
         return render_template('quiz.html',
@@ -138,7 +182,8 @@ def quiz_screen(category):
                                submitted_answers=submitted_answers,
                                correct_answers=[q["answer"] for q in quiz["questions"]],
                                reward=reward_earned,
-                               show_results=True)  # flag to show answers
+                               total_incorrect=total_incorrect,
+                               show_results=True)
 
     # GET request: show quiz normally
     return render_template('quiz.html',
@@ -146,38 +191,24 @@ def quiz_screen(category):
                            category=category,
                            submitted_answers=None,
                            correct_answers=None,
+                           total_incorrect=0,
                            show_results=False)
 
 @app.route('/final_score')
 def final_score():
     if len(session.get('completed_quizzes', [])) < len(QUIZ_DATA):
-        return redirect(url_for('index'))
+        return redirect(url_for('index_start'))
 
     total_possible = sum(get_total_questions(cat) for cat in QUIZ_DATA.keys())
-    final_percentage = int((session['score'] / total_possible) * 100)
+    
+    current_score = session.get('score', 0)
+    final_percentage = int((current_score / total_possible) * 100) if total_possible > 0 else 0
 
     return render_template('final_score.html',
-                           final_score=session['score'],
+                           final_score=current_score,
                            total_possible=total_possible,
                            final_percentage=final_percentage,
                            rewards=session.get('rewards', []))
-
-# ✅ New route added for login redirect
-@app.route('/index')
-def go_to_index():
-    return render_template('index.html')
-
-@app.route('/')
-def login_page():
-    return render_template('login.html')
-
-@app.route('/index')
-def index():
-    session['score'] = 0
-    session['completed_quizzes'] = []
-    session['rewards'] = []
-    return render_template('index.html')
-
 
 
 # --- Run the App ---

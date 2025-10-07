@@ -2,7 +2,7 @@
 
 {% block content %}
 <style>
-/* Your existing styles + new styles for answers feedback */
+/* --- STYLES SECTION --- */
 
 .quiz-container {
     max-width: 48rem;
@@ -174,12 +174,84 @@
     border-radius: 1rem;
     font-size: 1.2rem;
 }
+
+/* NEW STYLES FOR STICKERS/EMOJIS (Visual Feedback) */
+.feedback-container {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 3rem; /* Large emoji size */
+}
+.feedback-success {
+    background-color: #ecfdf5; /* Light green background */
+    border: 2px solid #10b981;
+}
+.feedback-fail {
+    background-color: #fef2f2; /* Light red background */
+    border: 2px solid #ef4444;
+}
+
+.home-button {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.75rem;
+    border-radius: 50%;
+    background-color: #0ea5e9;
+    border: 3px solid #38bdf8;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-button:hover {
+    background-color: #0284c7;
+    transform: scale(1.1);
+}
+
+.home-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    fill: white;
+}
+
+.home-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+    text-decoration: none;
+}
+
+.home-label {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #0ea5e9;
+    font-weight: 600;
+}
 </style>
+
+{# HIDDEN AUDIO ELEMENTS #}
+<audio id="success-sound" src="{{ url_for('static', filename='success.mp3') }}" preload="auto"></audio>
+<audio id="fail-sound" src="{{ url_for('static', filename='fail.mp3') }}" preload="auto"></audio>
 
 <div class="quiz-container">
     <h2 class="quiz-title">{{ quiz.title }}</h2>
 
-    <form method="POST">
+    {# FEEDBACK CONTAINER #}
+    {% if show_results %}
+        {% if total_incorrect == 0 %}
+            <div id="quiz-feedback" class="feedback-container feedback-success">
+                🥳 Perfect Score! You're a Water Saver Pro! 💧🌟
+            </div>
+        {% else %}
+            <div id="quiz-feedback" class="feedback-container feedback-fail">
+                😔 Almost! Don't worry, keep learning! 😭
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <form method="POST" id="quiz-form">
         {% for i, question in enumerate(quiz.questions) %}
             <div class="question-card">
                 <p><strong>Q{{ i + 1 }}.</strong> {{ question.q }}</p>
@@ -187,7 +259,7 @@
                     {% for option in question.options %}
                         {# Determine if this option was selected by user #}
                         {% set user_selected = (submitted_answers and submitted_answers['q' ~ i] == option) %}
-                        {# Determine if show results (after submit) #}
+                        
                         {% if show_results %}
                             {% if option == question.answer %}
                                 {# Correct answer option #}
@@ -233,7 +305,8 @@
         {% endfor %}
 
         {% if not show_results %}
-            <button type="submit" class="submit-button">Submit Answers</button>
+            {# --- SUBMIT BUTTON WITH SOUND DELAY HANDLER --- #}
+            <button type="submit" class="submit-button" onclick="return handleSubmission(event);">Submit Answers</button>
         {% else %}
             {% if reward %}
                 <div class="reward-message">
@@ -249,51 +322,78 @@
     </form>
 </div>
 
-<!-- Water Drop Home Button -->
-<style>
-.home-button {
-    display: inline-block;
-    margin-top: 2rem;
-    padding: 0.75rem;
-    border-radius: 50%;
-    background-color: #0ea5e9;
-    border: 3px solid #38bdf8;
-    transition: background-color 0.3s, transform 0.2s;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
+{# --- JAVASCRIPT FOR SOUND ON SUBMIT --- #}
+{% if not show_results %}
+<script>
+    function handleSubmission(event) {
+        const form = document.getElementById('quiz-form');
+        let totalCorrect = 0;
+        
+        // Embed the correct answers from the Python object into JavaScript
+        const questions = [
+            {% for question in quiz.questions %}
+                { answer: "{{ question.answer | e }}" },
+            {% endfor %}
+        ];
 
-.home-button:hover {
-    background-color: #0284c7;
-    transform: scale(1.1);
-}
+        // 1. Prevent the default form submission (stops the page reload)
+        event.preventDefault();
 
-.home-icon {
-    width: 2.5rem;
-    height: 2.5rem;
-    fill: white;
-}
+        // 2. Client-side check for which sound to play
+        let allAnswered = true;
+        for (let i = 0; i < questions.length; i++) {
+            const radioName = 'q' + i;
+            // Use form.elements to correctly retrieve the selected value from radio buttons
+            const selectedElement = form.querySelector('input[name="' + radioName + '"]:checked');
+            const selected = selectedElement ? selectedElement.value : null;
+            
+            if (!selected) {
+                // If a question is unanswered, stop and let the native HTML validation handle it
+                allAnswered = false;
+                break; 
+            }
+            if (selected === questions[i].answer) {
+                totalCorrect++;
+            }
+        }
 
-.home-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 2rem;
-    text-decoration: none;
-}
+        if (!allAnswered) {
+             // If validation failed, let the form submit naturally to show required field messages
+             form.submit();
+             return;
+        }
 
-.home-label {
-    margin-top: 0.5rem;
-    font-size: 1rem;
-    color: #0ea5e9;
-    font-weight: 600;
-}
-</style>
+        // 3. Play the sound
+        const totalIncorrect = questions.length - totalCorrect;
+        const successSound = document.getElementById('success-sound');
+        const failSound = document.getElementById('fail-sound');
+        
+        const soundToPlay = totalIncorrect === 0 ? successSound : failSound;
+
+        if (soundToPlay) {
+            // Attempt to play the sound
+            soundToPlay.play().catch(error => {
+                console.warn("Sound blocked/failed on click:", error);
+            });
+            
+            // 4. Wait for the sound to play for a brief moment, then submit the form (page reload)
+            // 750ms is usually a good delay for a quick sound
+            setTimeout(() => {
+                form.submit();
+            }, 750); 
+        } else {
+            // If sound elements are not available, submit immediately
+            form.submit();
+        }
+        
+        // Returning false is unnecessary since we call event.preventDefault()
+    }
+</script>
+{% endif %}
 
 <div style="text-align: center;">
-    <a href="{{ url_for('index') }}" class="home-wrapper" title="Back to Home">
+    <a href="{{ url_for('index_start') }}" class="home-wrapper" title="Back to Home">
         <div class="home-button">
-            <!-- Water drop SVG icon -->
             <svg xmlns="http://www.w3.org/2000/svg" class="home-icon" viewBox="0 0 24 24">
                 <path d="M12 2C9.243 6.278 6 10.182 6 13a6 6 0 0012 0c0-2.818-3.243-6.722-6-11z"/>
             </svg>
@@ -301,7 +401,5 @@
         <div class="home-label">Home</div>
     </a>
 </div>
-
-
 
 {% endblock %}
