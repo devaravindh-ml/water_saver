@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card final-screen" style="text-align: center; padding: 50px; background-color: #f8f9fa; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.4);">
+    <h2 style="color: #007bff;">Mission Complete! Your Final Water Saver Score! 🏆</h2>
+    
+    <p class="final-score-text" style="font-size: 3em; font-weight: 900; color: #28a745; margin: 20px 0;">
+        {{ final_score }} / {{ total_possible }}
+    </p>
+    <p class="final-percentage-text" style="font-size: 1.5em; color: #6c757d;">
+        Overall Grade: <strong style="color: #dc3545;">{{ final_percentage }}%</strong>
+    </p>
+
+    <div class="rewards-section" style="margin-top: 40px; padding: 30px; border-top: 1px solid #ccc;">
+        <h3 style="color: #007bff;">Your Collected Badges:</h3>
+        {% if rewards %}
+            <ul style="list-style: none; padding: 0; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                {% for reward in rewards %}
+                    <li class="reward-item" style="padding: 10px 20px; background-color: #ffe082; border-radius: 20px; font-weight: bold; color: #333; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        {{ reward }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Keep trying! You didn't collect any badges this time. Remember the facts!</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('index') }}" class="button retry-button" style="display: inline-block; margin-top: 40px; padding: 15px 30px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 1.1em;">
+        Try Again & Earn More Badges
+    </a>
+</div>
+{% endblock %}
