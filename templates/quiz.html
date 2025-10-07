@@ -1,37 +1,307 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="quiz-container" style="max-width: 800px; margin: 20px auto; padding: 30px; background-color: white; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 123, 255, 0.2);">
-    
-    <h2 class="quiz-title" style="color: #007bff; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-bottom: 20px;">
-        {{ quiz.title }}
-    </h2>
+<style>
+/* Your existing styles + new styles for answers feedback */
+
+.quiz-container {
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fef3c7;
+    border-radius: 1.5rem;
+    border: 6px solid #fbbf24;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.7s ease-out;
+}
+
+@keyframes slideIn {
+    0% { transform: translateY(20px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.quiz-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #10b981;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 4px dashed #fcd34d;
+}
+
+.question-card {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: #ffffff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+.question-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+                0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.radio-label input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.radio-label span {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #374151;
+    padding-left: 2rem;
+    position: relative;
+}
+
+.radio-label span::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 50%;
+    border: 2px solid #a78bfa;
+    background-color: #fff;
+}
+
+.radio-label:hover {
+    border-color: #a78bfa;
+    background-color: #f3e8ff;
+}
+
+.radio-label input[type="radio"]:checked + span {
+    font-weight: 700;
+    color: #5b21b6;
+}
+
+.radio-label input[type="radio"]:checked + span::after {
+    content: '';
+    position: absolute;
+    left: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background-color: #8b5cf6;
+    z-index: 10;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 1rem 2.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 0.75rem;
+    color: white;
+    background-color: #ec4899;
+    transition: all 0.3s;
+    box-shadow: 0 10px 15px -3px rgba(236, 72, 153, 0.5),
+                0 4px 6px -4px rgba(236, 72, 153, 0.5);
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #db2777;
+    transform: scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(236, 72, 153, 0.5);
+}
+
+.submit-button:active {
+    transform: scale(0.98);
+}
+
+/* Feedback Styles */
+.correct-answer {
+    margin-top: 0.5rem;
+    font-weight: 700;
+    color: #15803d;  /* green */
+}
+
+.incorrect-answer {
+    margin-top: 0.5rem;
+    font-weight: 700;
+    color: #b91c1c;  /* red */
+}
+
+.user-choice {
+    font-style: italic;
+    margin-top: 0.25rem;
+    color: #444;
+}
+
+.fact-text {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #6b7280;
+}
+
+.reward-message {
+    background-color: #d1fae5;
+    border: 2px solid #10b981;
+    color: #065f46;
+    font-weight: 700;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    border-radius: 1rem;
+    font-size: 1.2rem;
+}
+</style>
+
+<div class="quiz-container">
+    <h2 class="quiz-title">{{ quiz.title }}</h2>
 
     <form method="POST">
-        {% for q in quiz.questions %}
-        <div class="question-card" style="margin-bottom: 25px; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background-color: #f8f9fa;">
-            <p class="question-text" style="font-weight: bold; font-size: 1.1em; color: #333;">
-                {{ loop.index }}. {{ q.q }}
-            </p>
-            <div class="options-group" style="margin-top: 10px;">
-                {% for option in q.options %}
-                <label class="radio-label" style="display: block; margin: 8px 0;">
-                    <input type="radio" name="q{{ loop.index0 }}" value="{{ option }}" required>
-                    <span style="margin-left: 8px;">{{ option }}</span>
-                </label>
-                {% endfor %}
+        {% for i, question in enumerate(quiz.questions) %}
+            <div class="question-card">
+                <p><strong>Q{{ i + 1 }}.</strong> {{ question.q }}</p>
+                <div class="options">
+                    {% for option in question.options %}
+                        {# Determine if this option was selected by user #}
+                        {% set user_selected = (submitted_answers and submitted_answers['q' ~ i] == option) %}
+                        {# Determine if show results (after submit) #}
+                        {% if show_results %}
+                            {% if option == question.answer %}
+                                {# Correct answer option #}
+                                <label class="radio-label" style="border-color: #15803d; background-color: #dcfce7; cursor: default;">
+                                    <input type="radio" name="q{{ i }}" value="{{ option }}" {% if user_selected %}checked{% endif %} disabled>
+                                    <span>{{ option }}</span>
+                                </label>
+                            {% elif user_selected %}
+                                {# User selected wrong option #}
+                                <label class="radio-label" style="border-color: #b91c1c; background-color: #fee2e2; cursor: default;">
+                                    <input type="radio" name="q{{ i }}" value="{{ option }}" checked disabled>
+                                    <span>{{ option }}</span>
+                                </label>
+                            {% else %}
+                                {# Other options #}
+                                <label class="radio-label" style="cursor: default;">
+                                    <input type="radio" name="q{{ i }}" value="{{ option }}" disabled>
+                                    <span>{{ option }}</span>
+                                </label>
+                            {% endif %}
+                        {% else %}
+                            {# Before submit - normal radio buttons #}
+                            <label class="radio-label">
+                                <input type="radio" name="q{{ i }}" value="{{ option }}" {% if user_selected %}checked{% endif %} required>
+                                <span>{{ option }}</span>
+                            </label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                {% if show_results %}
+                    {% set user_answer = submitted_answers['q' ~ i] %}
+                    {% if user_answer == question.answer %}
+                        <p class="correct-answer">✅ Correct! Good job.</p>
+                    {% else %}
+                        <p class="incorrect-answer">❌ Incorrect.</p>
+                        <p class="user-choice">Your answer: "{{ user_answer or 'No answer' }}"</p>
+                        <p class="correct-answer">Correct answer: "{{ question.answer }}"</p>
+                    {% endif %}
+                    <p class="fact-text"><em>Fact:</em> {{ question.fact }}</p>
+                {% endif %}
             </div>
-        </div>
         {% endfor %}
 
-        <button type="submit" class="button submit-button" style="width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 1.2em; cursor: pointer; margin-bottom: 15px;">
-            Submit & See My Score for this Screen
-        </button>
+        {% if not show_results %}
+            <button type="submit" class="submit-button">Submit Answers</button>
+        {% else %}
+            {% if reward %}
+                <div class="reward-message">
+                    🎉 You earned the reward: <strong>{{ reward }}</strong>
+                </div>
+            {% endif %}
+            <div style="margin-top: 1rem; text-align: center;">
+                <a href="{{ url_for('quiz_screen', category=quiz.next_route) }}" class="submit-button" style="text-decoration:none; display:inline-block;">
+                    Next Quiz &raquo;
+                </a>
+            </div>
+        {% endif %}
     </form>
-    
-    <!-- New Home Button added here -->
-    <a href="{{ url_for('index') }}" class="button" style="display: block; width: 100%; padding: 15px; background-color: #6c757d; color: white; border: none; border-radius: 8px; font-size: 1.2em; cursor: pointer; text-align: center; text-decoration: none;">
-        Go to Home Page
+</div>
+
+<!-- Water Drop Home Button -->
+<style>
+.home-button {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.75rem;
+    border-radius: 50%;
+    background-color: #0ea5e9;
+    border: 3px solid #38bdf8;
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.home-button:hover {
+    background-color: #0284c7;
+    transform: scale(1.1);
+}
+
+.home-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    fill: white;
+}
+
+.home-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 2rem;
+    text-decoration: none;
+}
+
+.home-label {
+    margin-top: 0.5rem;
+    font-size: 1rem;
+    color: #0ea5e9;
+    font-weight: 600;
+}
+</style>
+
+<div style="text-align: center;">
+    <a href="{{ url_for('index') }}" class="home-wrapper" title="Back to Home">
+        <div class="home-button">
+            <!-- Water drop SVG icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" class="home-icon" viewBox="0 0 24 24">
+                <path d="M12 2C9.243 6.278 6 10.182 6 13a6 6 0 0012 0c0-2.818-3.243-6.722-6-11z"/>
+            </svg>
+        </div>
+        <div class="home-label">Home</div>
     </a>
 </div>
+
+
+
 {% endblock %}

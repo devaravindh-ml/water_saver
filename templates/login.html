@@ -1,0 +1,26 @@
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+</head>
+<body style="display:flex;align-items:center;justify-content:center;height:100vh;background:#e0f7fa;font-family:sans-serif;">
+  <div style="background:#fff;padding:40px;border-radius:10px;box-shadow:0 0 20px rgba(0,0,0,0.1);text-align:center;">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Enter your name" style="padding:10px;width:100%;margin-bottom:20px;border:1px solid #ccc;border-radius:5px;"><br>
+    <button onclick="login()" style="padding:10px 20px;background:#10b981;color:#fff;border:none;border-radius:5px;cursor:pointer;">Login</button>
+  </div>
+
+  <script>
+    function login() {
+      const username = document.getElementById('username').value.trim();
+      if (username) {
+        localStorage.setItem('username', username);
+        window.location.href = "/index"; // Go to main page
+      } else {
+        alert("Please enter your name");
+      }
+    }
+  </script>
+</body>
+</html>
