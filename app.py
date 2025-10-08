@@ -144,6 +144,9 @@ def quiz_screen(category):
 
     quiz = QUIZ_DATA[category]
     num_questions = get_total_questions(category)
+    
+    # 🌟 NEW: Get username from session to pass to the template
+    username = session.get('username')
 
     if request.method == 'POST':
         user_score = 0
@@ -183,7 +186,9 @@ def quiz_screen(category):
                                correct_answers=[q["answer"] for q in quiz["questions"]],
                                reward=reward_earned,
                                total_incorrect=total_incorrect,
-                               show_results=True)
+                               show_results=True,
+                               # 🌟 NEW: Pass username to results page
+                               username=username)
 
     # GET request: show quiz normally
     return render_template('quiz.html',
@@ -192,7 +197,9 @@ def quiz_screen(category):
                            submitted_answers=None,
                            correct_answers=None,
                            total_incorrect=0,
-                           show_results=False)
+                           show_results=False,
+                           # 🌟 NEW: Pass username to quiz page
+                           username=username)
 
 @app.route('/final_score')
 def final_score():
@@ -216,4 +223,4 @@ if __name__ == '__main__':
     import os
     if not os.path.exists('templates'):
         os.makedirs('templates')
-    app.run(debug=True, port=5033)
+    app.run(debug=True, port=5048)

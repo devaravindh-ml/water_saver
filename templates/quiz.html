@@ -2,7 +2,7 @@
 
 {% block content %}
 <style>
-/* --- STYLES SECTION --- */
+/* --- STYLES SECTION (unchanged for brevity, but included in full code) --- */
 
 .quiz-container {
     max-width: 48rem;
@@ -30,6 +30,21 @@
     padding-bottom: 1rem;
     border-bottom: 4px dashed #fcd34d;
 }
+
+/* --- UPDATED STYLE FOR WELCOME MESSAGE (Child-Friendly Pink/Purple) --- */
+.welcome-message {
+    text-align: center;
+    font-size: 1.8rem; /* Slightly larger text */
+    font-weight: 800; /* Extra bold */
+    color: #db2777; /* Bright Pink color */
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background-color: #fce7f3; /* Very light pink background */
+    border-radius: 1rem; /* More rounded corners */
+    border: 3px dashed #f9a8d4; /* Dashed border for fun */
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5); /* Slight shadow for pop */
+}
+/* ------------------------------------------------------------------- */
 
 .question-card {
     margin-bottom: 2rem;
@@ -231,12 +246,23 @@
 }
 </style>
 
-{# HIDDEN AUDIO ELEMENTS #}
+{# --- AUDIO ELEMENTS ARE HERE TO ENABLE SOUNDS --- #}
 <audio id="success-sound" src="{{ url_for('static', filename='success.mp3') }}" preload="auto"></audio>
 <audio id="fail-sound" src="{{ url_for('static', filename='fail.mp3') }}" preload="auto"></audio>
 
+{# --- CONFETTI LIBRARY IS INCLUDED FOR THE CELEBRATION EFFECT --- #}
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.0/dist/confetti.browser.min.js"></script>
+
 <div class="quiz-container">
     <h2 class="quiz-title">{{ quiz.title }}</h2>
+
+    {# --- CODE TO DISPLAY THE USERNAME --- #}
+    {% if username is defined and username and username != 'Guest' %}
+        <p class="welcome-message">
+            Welcome! {{ username }} Good luck! 💧
+        </p>
+    {% endif %}
+    {# ---------------------------------------------------------------- #}
 
     {# FEEDBACK CONTAINER #}
     {% if show_results %}
@@ -313,18 +339,42 @@
                     🎉 You earned the reward: <strong>{{ reward }}</strong>
                 </div>
             {% endif %}
-            <div style="margin-top: 1rem; text-align: center;">
-                <a href="{{ url_for('quiz_screen', category=quiz.next_route) }}" class="submit-button" style="text-decoration:none; display:inline-block;">
-                    Next Quiz &raquo;
+            <div style="margin-top: 1rem; text-align: center; overflow-x: hidden; overflow-y: hidden;">
+                <a href="{{ url_for('quiz_screen', category=quiz.next_route) }}" 
+                    class="submit-button" 
+                    style="text-decoration: none; 
+                            display: inline-block; 
+                            max-width: 100%; 
+                            box-sizing: border-box; 
+                            white-space: nowrap; 
+                            padding: 0.75rem 2rem; 
+                            border-radius: 0.375rem; 
+                            background-color: #d6336c; 
+                            color: white; 
+                            font-weight: bold; 
+                            transition: box-shadow 0.3s ease;">
+                    Next Quiz
                 </a>
             </div>
         {% endif %}
     </form>
 </div>
 
-{# --- JAVASCRIPT FOR SOUND ON SUBMIT --- #}
+{# --- JAVASCRIPT FOR SOUND AND CONFETTI ON SUBMIT (FIXED DELAY) --- #}
 {% if not show_results %}
 <script>
+    // Confetti function for a celebratory effect
+    function runConfetti() {
+        if (typeof confetti !== 'undefined') {
+            confetti({
+                particleCount: 150,
+                spread: 120,
+                origin: { y: 0.6 },
+                colors: ['#a833e7', '#f1c40f', '#e74c3c', '#2ecc71'] // Child-friendly colors
+            });
+        }
+    }
+
     function handleSubmission(event) {
         const form = document.getElementById('quiz-form');
         let totalCorrect = 0;
@@ -339,16 +389,14 @@
         // 1. Prevent the default form submission (stops the page reload)
         event.preventDefault();
 
-        // 2. Client-side check for which sound to play
+        // 2. Client-side check for scoring and validation
         let allAnswered = true;
         for (let i = 0; i < questions.length; i++) {
             const radioName = 'q' + i;
-            // Use form.elements to correctly retrieve the selected value from radio buttons
             const selectedElement = form.querySelector('input[name="' + radioName + '"]:checked');
             const selected = selectedElement ? selectedElement.value : null;
             
             if (!selected) {
-                // If a question is unanswered, stop and let the native HTML validation handle it
                 allAnswered = false;
                 break; 
             }
@@ -357,36 +405,47 @@
             }
         }
 
+        // If not all questions are answered, re-submit to allow browser's validation
         if (!allAnswered) {
-             // If validation failed, let the form submit naturally to show required field messages
              form.submit();
-             return;
+             return; 
         }
 
-        // 3. Play the sound
+        // 3. Determine success state
         const totalIncorrect = questions.length - totalCorrect;
+        const isPerfectScore = totalIncorrect === 0;
+
+        // 4. Play the sound and confetti
         const successSound = document.getElementById('success-sound');
         const failSound = document.getElementById('fail-sound');
         
-        const soundToPlay = totalIncorrect === 0 ? successSound : failSound;
+        // Select the correct sound based on score
+        const soundToPlay = isPerfectScore ? successSound : failSound;
+
+        // **CORRECTION: Delay set to 3000ms (3 seconds) as requested.**
+        const SUBMISSION_DELAY_MS = 3000; 
 
         if (soundToPlay) {
+            // Trigger Confetti for a perfect score
+            if (isPerfectScore) {
+                runConfetti();
+            }
+            
             // Attempt to play the sound
+            // Reset audio time to ensure it plays from the start
+            soundToPlay.currentTime = 0; 
             soundToPlay.play().catch(error => {
                 console.warn("Sound blocked/failed on click:", error);
             });
             
-            // 4. Wait for the sound to play for a brief moment, then submit the form (page reload)
-            // 750ms is usually a good delay for a quick sound
+            // 5. Wait for the set delay, then submit the form
             setTimeout(() => {
                 form.submit();
-            }, 750); 
+            }, SUBMISSION_DELAY_MS); 
         } else {
-            // If sound elements are not available, submit immediately
+            // Fallback: If sound elements are unavailable, submit immediately
             form.submit();
         }
-        
-        // Returning false is unnecessary since we call event.preventDefault()
     }
 </script>
 {% endif %}

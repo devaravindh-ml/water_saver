@@ -71,6 +71,7 @@ main {
 .submit-button:hover {
     background-color: #45a049;
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(214, 51, 108, 0.5);
 }
 
 /* Quiz Specific Styles */

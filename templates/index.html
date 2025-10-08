@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <center>
     <title>Water Saver Home - Mission Start</title>
-    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
@@ -20,7 +19,7 @@
 
     /* Typography Enhancements */
     h1, h2, h3, h4 {
-        font-family: 'Luckiest+Guy', cursive;
+        font-family: 'Luckiest Guy', cursive;
         letter-spacing: 1px;
     }
 
@@ -88,10 +87,8 @@
     </style>
 </head>
 <body class="p-6">
-<!-- Main Container -->
 <div class="card splash-screen shimmer-border big-card-glow mx-auto max-w-5xl min-h-[80vh] flex flex-col justify-center p-10 md:p-14 bg-white/80 rounded-3xl shadow-2xl mt-6 mb-10 animate-entrance">
 
-    <!-- Banner -->
     <div class="mb-10">
         <img
             src="https://placehold.co/600x200/00bcd4/ffffff?text=+Water+Mission+Start!"
@@ -100,38 +97,32 @@
         />
     </div>
 
-    <!-- Welcome Header: Modified to display the username -->
     <h2 class="text-6xl font-extrabold text-blue-800 mb-6 header-glow text-center">
         🌊 Welcome, <span style="color:#10b981;">{{ username or 'Future' }}</span> Water <span style="color:#ef4444;">Guardian!</span> 💧
     </h2>
 
-    <!-- Mission Line -->
     <p class="text-3xl text-pink-600 mb-10 font-black text-center animate-pulse" style="text-shadow: 1px 1px #f9a8d4;">
         Your mission to save the planet starts now!
     </p>
 
-    <!-- Mission Briefing Box -->
     <div class="p-8 rounded-3xl bg-yellow-100 shadow-2xl border-4 shimmer-border mb-10">
         <h3 class="text-4xl font-black text-red-600 mb-5 border-b-4 border-red-400 pb-3 text-center">
             🚀 Mission Briefing: How to Play!
         </h3>
-        <ul class="space-y-4 max-w-xl mx-auto">
-            <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
-                <span class="mr-3 text-3xl">💡</span>
-                <span class="font-semibold text-lg">Answer the questions across <strong>3 awesome screens!</strong></span>
-            </li>
-            <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
-                <span class="mr-3 text-3xl text-green-600">✅</span>
-                <span class="font-semibold text-lg">Get at least <strong>2 out of 3</strong> right to earn a cool Badge!</span>
-            </li>
-            <li class="flex items-center p-4 rounded-lg bg-white shadow-md list-item-hover">
-                <span class="mr-3 text-3xl text-purple-700">🏆</span>
-                <span class="font-semibold text-lg">Collect all the badges to become a <strong>Green Guru!</strong></span>
-            </li>
-        </ul>
+        <span class="mr-3 text-xl font-bold text-gray-500">1.</span>
+        <span class="mr-3 text-3xl">💡</span>
+        <span class="font-semibold text-lg">Answer the questions across <strong>3 awesome screens!</strong></span>
+        <br />
+        <span class="mr-3 text-xl font-bold text-gray-500">2.</span>
+        <span class="mr-3 text-3xl text-green-600">✅</span>
+        <span class="font-semibold text-lg">Get at least <strong>2 out of 3</strong> right to earn a cool Badge!</span>
+        <br />
+        <span class="mr-3 text-xl font-bold text-gray-500">3.</span>
+        <span class="mr-3 text-3xl text-purple-700">🏆</span>
+        <span class="font-semibold text-lg">Collect all the badges to become a <strong>Green Guru!</strong></span>
+        <br />
     </div>
 
-    <!-- Quiz Summary -->
     <p class="text-3xl font-extrabold text-purple-700 text-center mb-12" style="text-shadow: 1px 1px #ddd;">
         You'll test your knowledge on: 
         <span class="text-blue-600 font-bold">The Daily Drip</span>, 
@@ -139,7 +130,6 @@
         <span class="text-orange-600 font-bold">Eco-Action Challenge</span>.
     </p>
 
-    <!-- Start Button (inline styles) -->
     <div class="text-center">
         <a href="{{ url_for('quiz_screen', category='daily_drip') }}"
             style="
@@ -163,18 +153,10 @@
         >
             Start Your Water Mission! 🚀
         </a>
-    </div>
+   
+</center>
     
-    <!-- Logout Link -->
-    <div class="text-center mt-8">
-        <a href="{{ url_for('logout') }}" class="text-red-500 font-bold hover:text-red-700 text-lg">
-            Logout
-        </a>
-    </div>
 
-</div>
-
-<!-- JS -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Water Saver Quiz: Welcome screen loaded successfully!");
@@ -185,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
 </script>
 </body>
 </html>
